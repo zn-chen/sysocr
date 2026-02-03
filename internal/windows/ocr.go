@@ -7,4 +7,4 @@ package windows
 */
 import "C"
 
-// TODO: implement CGO bridge
+// TODO: 实现 CGO 桥接

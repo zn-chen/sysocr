@@ -1,6 +1,6 @@
 package sysocr
 
-// BoundingBox represents the location of text in an image.
+// BoundingBox 表示文本在图片中的位置。
 type BoundingBox struct {
 	X      float64
 	Y      float64
@@ -8,27 +8,27 @@ type BoundingBox struct {
 	Height float64
 }
 
-// TextBlock represents a recognized text block with its location.
+// TextBlock 表示识别到的文本块及其位置信息。
 type TextBlock struct {
 	Text        string
 	BoundingBox BoundingBox
 }
 
-// Result contains the OCR recognition result.
+// Result 包含 OCR 识别结果。
 type Result struct {
 	Blocks []TextBlock
-	Text   string // All text concatenated
+	Text   string // 所有文本拼接
 }
 
-// Input specifies the image source. Only one field should be set.
+// Input 指定图片来源，三个字段只能设置其中一个。
 type Input struct {
-	FilePath string // Local file path
-	URL      string // Remote URL (http/https)
-	Data     []byte // In-memory image data
+	FilePath string // 本地文件路径
+	URL      string // 远程 URL (http/https)
+	Data     []byte // 内存中的图片数据
 }
 
-// Options configures the OCR recognition.
+// Options 配置 OCR 识别参数。
 type Options struct {
 	Input     Input
-	Languages []string // Optional: language hints (e.g., "zh-Hans", "en")
+	Languages []string // 可选：语言提示（如 "zh-Hans", "en"）
 }

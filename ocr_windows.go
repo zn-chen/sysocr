@@ -2,8 +2,8 @@
 
 package sysocr
 
-// Recognize performs OCR on the provided image input.
+// Recognize 对提供的图片进行 OCR 识别。
 func Recognize(opts Options) (*Result, error) {
-	// TODO: implement
+	// TODO: 实现 Windows 平台
 	panic("not implemented")
 }

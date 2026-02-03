@@ -13,7 +13,7 @@ var (
 	ErrMultipleInput = errors.New("sysocr: multiple inputs specified, only one allowed")
 )
 
-// resolveInput converts Input to raw image bytes.
+// resolveInput 将 Input 转换为原始图片字节数据。
 func resolveInput(input Input) ([]byte, error) {
 	count := 0
 	if input.FilePath != "" {
@@ -48,6 +48,7 @@ func resolveInput(input Input) ([]byte, error) {
 	return nil, ErrNoInput
 }
 
+// fetchURL 从远程 URL 获取图片数据。
 func fetchURL(url string) ([]byte, error) {
 	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 		return nil, errors.New("sysocr: URL must start with http:// or https://")

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// TODO: implement Windows.Media.Ocr
+// TODO: 实现 Windows.Media.Ocr
 
 OCRResult sysocr_recognize(const unsigned char* data, int length, const char** languages, int lang_count) {
     OCRResult result = {0};
