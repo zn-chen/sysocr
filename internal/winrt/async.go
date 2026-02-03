@@ -167,9 +167,9 @@ var IID_IInMemoryRandomAccessStream = GUID{0x905A0FE1, 0xBC53, 0x11DF, [8]byte{0
 
 // 创建 InMemoryRandomAccessStream
 func CreateInMemoryRandomAccessStream() (*IRandomAccessStream, error) {
-	factory, err := GetActivationFactory("Windows.Storage.Streams.InMemoryRandomAccessStream", &IID_IRandomAccessStream)
+	instance, err := ActivateInstance("Windows.Storage.Streams.InMemoryRandomAccessStream")
 	if err != nil {
 		return nil, err
 	}
-	return (*IRandomAccessStream)(unsafe.Pointer(factory)), nil
+	return (*IRandomAccessStream)(unsafe.Pointer(instance)), nil
 }

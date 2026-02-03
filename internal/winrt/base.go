@@ -13,6 +13,7 @@ var (
 	modcombase       = syscall.NewLazyDLL("combase.dll")
 	procCoInitializeEx        = modole32.NewProc("CoInitializeEx")
 	procRoInitialize          = modcombase.NewProc("RoInitialize")
+	procRoActivateInstance    = modcombase.NewProc("RoActivateInstance")
 	procRoGetActivationFactory = modcombase.NewProc("RoGetActivationFactory")
 	procWindowsCreateString   = modcombase.NewProc("WindowsCreateString")
 	procWindowsDeleteString   = modcombase.NewProc("WindowsDeleteString")
@@ -139,4 +140,23 @@ func GetActivationFactory(classID string, iid *GUID) (*IInspectable, error) {
 		return nil, syscall.Errno(hr)
 	}
 	return factory, nil
+}
+
+// ActivateInstance 创建 WinRT 类的实例
+func ActivateInstance(classID string) (*IInspectable, error) {
+	hs, err := NewHString(classID)
+	if err != nil {
+		return nil, err
+	}
+	defer DeleteHString(hs)
+
+	var instance *IInspectable
+	hr, _, _ := procRoActivateInstance.Call(
+		uintptr(hs),
+		uintptr(unsafe.Pointer(&instance)),
+	)
+	if hr != 0 {
+		return nil, syscall.Errno(hr)
+	}
+	return instance, nil
 }
