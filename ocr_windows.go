@@ -202,13 +202,19 @@ func recognizeWithWinRT(data []byte, languages []string) (*Result, error) {
 
 		line := (*winrt.IOcrLine)(unsafe.Pointer(lineInsp))
 
-		// 获取所有单词
+		// 获取行文本
+		lineText := line.GetText()
+
+		// 获取所有单词来计算行的边界框
 		words, err := line.GetWords()
 		if err != nil {
 			line.Release()
 			continue
 		}
 
+		// 计算行的边界框（合并所有单词的边界框）
+		var minX, minY, maxX, maxY float32
+		first := true
 		wordCount := words.GetSize()
 		for j := uint32(0); j < wordCount; j++ {
 			wordInsp, err := words.GetAt(j)
@@ -217,29 +223,53 @@ func recognizeWithWinRT(data []byte, languages []string) (*Result, error) {
 			}
 
 			word := (*winrt.IOcrWord)(unsafe.Pointer(wordInsp))
-			text := word.GetText()
 			rect := word.GetBoundingRect()
 
-			block := TextBlock{
-				Text: text,
-				BoundingBox: BoundingBox{
-					X:      float64(rect.X) / imageWidth,
-					Y:      float64(rect.Y) / imageHeight,
-					Width:  float64(rect.Width) / imageWidth,
-					Height: float64(rect.Height) / imageHeight,
-				},
+			if first {
+				minX = rect.X
+				minY = rect.Y
+				maxX = rect.X + rect.Width
+				maxY = rect.Y + rect.Height
+				first = false
+			} else {
+				if rect.X < minX {
+					minX = rect.X
+				}
+				if rect.Y < minY {
+					minY = rect.Y
+				}
+				if rect.X+rect.Width > maxX {
+					maxX = rect.X + rect.Width
+				}
+				if rect.Y+rect.Height > maxY {
+					maxY = rect.Y + rect.Height
+				}
 			}
-			result.Blocks = append(result.Blocks, block)
-
-			if textBuilder.Len() > 0 {
-				textBuilder.WriteString(" ")
-			}
-			textBuilder.WriteString(text)
 
 			word.Release()
 		}
 
 		words.Release()
+
+		// 创建行级别的文本块
+		if !first { // 确保有至少一个单词
+			block := TextBlock{
+				Text: lineText,
+				BoundingBox: BoundingBox{
+					X:      float64(minX) / imageWidth,
+					Y:      float64(minY) / imageHeight,
+					Width:  float64(maxX-minX) / imageWidth,
+					Height: float64(maxY-minY) / imageHeight,
+				},
+			}
+			result.Blocks = append(result.Blocks, block)
+
+			if textBuilder.Len() > 0 {
+				textBuilder.WriteString("\n")
+			}
+			textBuilder.WriteString(lineText)
+		}
+
 		line.Release()
 	}
 
